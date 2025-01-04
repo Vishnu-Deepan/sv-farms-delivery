@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "508022383284",
+    "project_id": "sv-farms",
+    "storage_bucket": "sv-farms.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:508022383284:android:d051d0a058c6f05f0b2de1",
+        "android_client_info": {
+          "package_name": "com.visify.sv_farms"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAdK1tF_HdbyKn19aLjpJrpbolt2rBIrB8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:508022383284:android:08cb4752c4ce986e0b2de1",
+        "android_client_info": {
+          "package_name": "com.visify.sv_farms_admin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAdK1tF_HdbyKn19aLjpJrpbolt2rBIrB8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:508022383284:android:2270099557714b330b2de1",
+        "android_client_info": {
+          "package_name": "com.visify.sv_farms_delivery"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAdK1tF_HdbyKn19aLjpJrpbolt2rBIrB8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
