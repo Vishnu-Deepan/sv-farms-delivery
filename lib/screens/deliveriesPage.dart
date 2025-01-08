@@ -49,6 +49,7 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
       QuerySnapshot subscriptionsSnapshot = await FirebaseFirestore.instance
           .collection('subscriptions')
           .where('assignedDeliveryPerson', isEqualTo: _deliveryPersonId)
+          .where('isActivePlan', isEqualTo: true)
           .get();
 
       print("Step 2 Complete: Fetched subscriptions. Count: ${subscriptionsSnapshot.docs.length}");
@@ -59,54 +60,29 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
         for (var subscriptionDoc in subscriptionsSnapshot.docs) {
           print("Step 3: Processing subscription ID: ${subscriptionDoc.id}");
 
-          // Retrieve the uid field from the subscription document
+          // Retrieve the uid and userName from the subscription document
           String userId = subscriptionDoc['uid'];
-          print("Step 3: Retrieved UID from subscription: $userId");
-
-          // Fetch the daily log for the user
-          List<QueryDocumentSnapshot<Object?>>? dailyLog = await getUserDailyLog(userId);
-          if (dailyLog != null) {
-            print("Step 4: Daily log found for user $userId.");
-          } else {
-            print("Step 4: No daily log found for user $userId.");
-          }
+          String userName = subscriptionDoc['userName'];
+          String address = subscriptionDoc['fullAddress'];
+          print("Step 3: Retrieved UID: $userId, UserName: $userName, Address: $address");
 
           _userSubscriptions.add({
-            'subscription': subscriptionDoc,
-            'dailyLog': dailyLog,
+            'subscriptionId': subscriptionDoc.id,
+            'userName': userName,
+            'address': address,
+            'morningLitres': subscriptionDoc['morningLitres'],
+            'eveningLitres': subscriptionDoc['eveningLitres'],
+            'remainingLitres': subscriptionDoc['remainingLitres'],
+            'userPhone':subscriptionDoc['userPhone']
           });
 
-          print("Step 5: Added user subscription and daily log to the list.");
+
+          print("Step 5: Added user subscription details to the list.");
         }
       }
       setState(() {});
     } catch (e) {
       print("Error fetching subscriptions: $e");
-    }
-  }
-
-  // Fetch daily log for a specific user by UID
-  Future<List<QueryDocumentSnapshot<Object?>>?> getUserDailyLog(String userId) async {
-    print("Step 4: Querying dailyDeliveryLogs for user: $userId");
-
-    try {
-      QuerySnapshot dailyLogsSnapshot = await FirebaseFirestore.instance
-          .collection('dailyDeliveryLogs')
-          .doc(userId)
-          .collection('logs')
-          .get();
-
-      print("Step 4 Complete: Fetched daily logs for user $userId. Count: ${dailyLogsSnapshot.docs.length}");
-
-      if (dailyLogsSnapshot.docs.isNotEmpty) {
-        return dailyLogsSnapshot.docs; // Return the first daily log found
-      } else {
-        print("Step 4 Complete: No daily logs found for user $userId.");
-        return null; // No daily log found
-      }
-    } catch (e) {
-      print("Error fetching daily log for user $userId: $e");
-      return null;
     }
   }
 
@@ -121,20 +97,133 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
           : ListView.builder(
         itemCount: _userSubscriptions.length,
         itemBuilder: (context, index) {
-          var subscription = _userSubscriptions[index]['subscription'];
-          var dailyLog = _userSubscriptions[index]['dailyLog'];
+          var subscription = _userSubscriptions[index];
+          String userName = subscription['userName'];
+          String subscriptionId = subscription['subscriptionId'];
+          String address = subscription['address'];
+          double remainingLitres = subscription['remainingLitres'];
+          double morningLitres = subscription['morningLitres'];
+          double eveningLitres = subscription['eveningLitres'];
 
-          print("Step 7: Building ListTile for subscription ID: ${subscription.id}");
+          print("Step 7: Building ListTile for subscription ID: $subscriptionId");
 
-          if(dailyLog.length!=0) {
-            return ListTile(
-            title: Text('Subscription ID: ${subscription.id}'),
-            subtitle: Text('Days Remaining : ${dailyLog.length}'),
+          return Card(
+            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),  // More rounded corners for a modern look
+            ),
+            color: Colors.grey[900],  // Background color for the card
+            elevation: 8,  // More elevation for a raised effect
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // User Name and Address
+
+
+                            Center(
+                              child: Text(
+                                userName,
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.lightBlueAccent,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 5),
+                            Text(
+                              address,
+                              style: TextStyle(fontSize: 16, color: Colors.white70,fontWeight: FontWeight.bold),
+                            ),
+
+
+
+                  const SizedBox(height: 12),
+
+                  // Remaining Litres Section - Eye-catching design
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Remaining Litres:',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.orangeAccent,
+                        ),
+                      ),
+                      Text(
+                        "$remainingLitres Litres",
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Morning and Evening Litres Section - Larger text and bold
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Morning Delivery:',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.lightGreenAccent,
+                            ),
+                          ),
+                          Text(
+                            "$morningLitres Litres",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Evening Delivery:',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.lightBlueAccent,
+                            ),
+                          ),
+                          Text(
+                            "$eveningLitres Litres",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           );
-          }
-          return null;
         },
       ),
+
+
     );
   }
 }
+
