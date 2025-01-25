@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:sv_farms_delivery/screens/loginPage.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProfilePageLogic {
   final BuildContext context;
@@ -67,11 +68,23 @@ class ProfilePageLogic {
   }
 
   // Contact Admin functionality (e.g., open email or support page)
-  void contactAdmin() {
+  void contactAdmin() async{
     // Implement contact admin logic (e.g., open email, support chat, etc.)
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Contacting Admin...')),
     );
+    final String supportPhoneNumber =
+        'tel:+919080700123'; // Actual support number
+    Uri supportPhoneNumberUrl = Uri.parse(supportPhoneNumber);
+
+
+      if (await canLaunchUrl(supportPhoneNumberUrl)) {
+        await launchUrl(supportPhoneNumberUrl);
+      } else {
+        throw 'Could not launch $supportPhoneNumber';
+      }
+
 
   }
 }
