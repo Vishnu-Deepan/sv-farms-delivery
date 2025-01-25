@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import '../screens/accountPage.dart';
+import '../screens/profilePage.dart';
 import '../screens/deliveriesPage.dart';
 import '../screens/homePage.dart';
+import '../screens/mapPage.dart';
 
 class HomeNavBar extends StatefulWidget {
   const HomeNavBar({Key? key}) : super(key: key);
@@ -12,33 +13,39 @@ class HomeNavBar extends StatefulWidget {
 
 class _HomeNavBarState extends State<HomeNavBar> {
   int _selectedIndex = 0;
-  final PageController _pageController = PageController(initialPage: 0);  // PageController to control the PageView
   final List<Widget> _pages = [
     HomePage(),
     DeliveriesPage(),
-    AccountPage(),
+    UserLocationMapPage(),
+    ProfilePage(),
   ];
 
+  // Function to directly navigate to the last page, skipping intermediate pages
+  void navigateToLastPage() {
+    setState(() {
+      _selectedIndex = 3; // Directly set the selected index to ProfilePage
+    });
+  }
+
+  // Function to handle item selection in BottomNavigationBar
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;  // Update the selected index
     });
-    _pageController.animateToPage(index, duration: Duration(milliseconds: 300), curve: Curves.easeInOut);  // Animate page change
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: PageView(
-        controller: _pageController,
-        onPageChanged: (index) {
-          setState(() {
-            _selectedIndex = index;  // Sync the page index with the BottomNavigationBar
-          });
-        },
-        children: _pages,
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _pages,  // Display the selected page, without loading intermediate pages
       ),
       bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: Colors.deepPurple,
+        unselectedItemColor: Colors.grey.shade800,
+        unselectedLabelStyle: TextStyle(color: Colors.grey.shade800),
+
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         items: const <BottomNavigationBarItem>[
@@ -51,10 +58,20 @@ class _HomeNavBarState extends State<HomeNavBar> {
             label: 'Deliveries',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle),
+            icon: Icon(Icons.location_pin),
+            label: 'Map',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
             label: 'Account',
           ),
         ],
+      ),
+      // Button to navigate directly to the last page (Profile Page)
+      floatingActionButton: FloatingActionButton(
+        onPressed: navigateToLastPage,
+        child: Icon(Icons.navigate_next),
+        backgroundColor: Colors.deepPurple,
       ),
     );
   }

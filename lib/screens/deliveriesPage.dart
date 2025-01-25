@@ -15,14 +15,18 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
   @override
   void initState() {
     super.initState();
-    _loadDeliveryPersonId();
+    Future.delayed(Duration(seconds: 1), ()
+    {
+      _loadDeliveryPersonId();
+    });
   }
 
   // Load the logged-in delivery person's ID from shared preferences
   Future<void> _loadDeliveryPersonId() async {
     print("Step 1: Loading delivery person's ID from SharedPreferences.");
-    Map<String, String?> userSession = await SharedPreferencesHelper.getUserSession();
-    String? deliveryPersonId = userSession['userId'];  // Get the deliveryPersonId
+    Map<String, String?> userSession =
+        await SharedPreferencesHelper.getUserSession();
+    String? deliveryPersonId = userSession['userId']; // Get the deliveryPersonId
 
     print("Step 1 Complete: Retrieved delivery person ID: $deliveryPersonId");
     setState(() {
@@ -43,7 +47,8 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
       return;
     }
 
-    print("Step 2: Querying subscriptions collection for assignedDeliveryPerson: $_deliveryPersonId");
+    print(
+        "Step 2: Querying subscriptions collection for assignedDeliveryPerson: $_deliveryPersonId");
 
     try {
       QuerySnapshot subscriptionsSnapshot = await FirebaseFirestore.instance
@@ -52,10 +57,12 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
           .where('isActivePlan', isEqualTo: true)
           .get();
 
-      print("Step 2 Complete: Fetched subscriptions. Count: ${subscriptionsSnapshot.docs.length}");
+      print(
+          "Step 2 Complete: Fetched subscriptions. Count: ${subscriptionsSnapshot.docs.length}");
 
       if (subscriptionsSnapshot.docs.isEmpty) {
-        print("No subscriptions found for delivery person ID: $_deliveryPersonId");
+        print(
+            "No subscriptions found for delivery person ID: $_deliveryPersonId");
       } else {
         for (var subscriptionDoc in subscriptionsSnapshot.docs) {
           print("Step 3: Processing subscription ID: ${subscriptionDoc.id}");
@@ -64,7 +71,8 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
           String userId = subscriptionDoc['uid'];
           String userName = subscriptionDoc['userName'];
           String address = subscriptionDoc['fullAddress'];
-          print("Step 3: Retrieved UID: $userId, UserName: $userName, Address: $address");
+          print(
+              "Step 3: Retrieved UID: $userId, UserName: $userName, Address: $address");
 
           _userSubscriptions.add({
             'subscriptionId': subscriptionDoc.id,
@@ -73,9 +81,8 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
             'morningLitres': subscriptionDoc['morningLitres'],
             'eveningLitres': subscriptionDoc['eveningLitres'],
             'remainingLitres': subscriptionDoc['remainingLitres'],
-            'userPhone':subscriptionDoc['userPhone']
+            'userPhone': subscriptionDoc['userPhone']
           });
-
 
           print("Step 5: Added user subscription details to the list.");
         }
@@ -95,135 +102,135 @@ class _DeliveriesPageState extends State<DeliveriesPage> {
       body: _userSubscriptions.isEmpty
           ? Center(child: CircularProgressIndicator())
           : ListView.builder(
-        itemCount: _userSubscriptions.length,
-        itemBuilder: (context, index) {
-          var subscription = _userSubscriptions[index];
-          String userName = subscription['userName'];
-          String subscriptionId = subscription['subscriptionId'];
-          String address = subscription['address'];
-          double remainingLitres = subscription['remainingLitres'];
-          double morningLitres = subscription['morningLitres'];
-          double eveningLitres = subscription['eveningLitres'];
+              itemCount: _userSubscriptions.length,
+              itemBuilder: (context, index) {
+                var subscription = _userSubscriptions[index];
+                String userName = subscription['userName'];
+                String subscriptionId = subscription['subscriptionId'];
+                String address = subscription['address'];
+                var remainingLitres = subscription['remainingLitres'];
+                var morningLitres = subscription['morningLitres'];
+                var eveningLitres = subscription['eveningLitres'];
 
-          print("Step 7: Building ListTile for subscription ID: $subscriptionId");
+                print(
+                    "Step 7: Building ListTile for subscription ID: $subscriptionId");
 
-          return Card(
-            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),  // More rounded corners for a modern look
-            ),
-            color: Colors.grey[900],  // Background color for the card
-            elevation: 8,  // More elevation for a raised effect
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // User Name and Address
-
-
-                            Center(
-                              child: Text(
-                                userName,
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w900,
-                                  color: Colors.lightBlueAccent,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 5),
-                            Text(
-                              address,
-                              style: TextStyle(fontSize: 16, color: Colors.white70,fontWeight: FontWeight.bold),
-                            ),
-
-
-
-                  const SizedBox(height: 12),
-
-                  // Remaining Litres Section - Eye-catching design
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Remaining Litres:',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.orangeAccent,
-                        ),
-                      ),
-                      Text(
-                        "$remainingLitres Litres",
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
+                return Card(
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                        16), // More rounded corners for a modern look
                   ),
+                  color: Colors.grey[900], // Background color for the card
+                  elevation: 8, // More elevation for a raised effect
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // User Name and Address
 
-                  const SizedBox(height: 16),
-
-                  // Morning and Evening Litres Section - Larger text and bold
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Morning Delivery:',
+                        Center(
+                          child: Text(
+                            userName,
                             style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.lightGreenAccent,
-                            ),
-                          ),
-                          Text(
-                            "$morningLitres Litres",
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Evening Delivery:',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w900,
                               color: Colors.lightBlueAccent,
                             ),
                           ),
-                          Text(
-                            "$eveningLitres Litres",
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          address,
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.white70,
+                              fontWeight: FontWeight.bold),
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        // Remaining Litres Section - Eye-catching design
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Remaining Litres:',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.orangeAccent,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                            Text(
+                              "$remainingLitres Litres",
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        // Morning and Evening Litres Section - Larger text and bold
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Morning Delivery:',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.lightGreenAccent,
+                                  ),
+                                ),
+                                Text(
+                                  "$morningLitres Litres",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Evening Delivery:',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.lightBlueAccent,
+                                  ),
+                                ),
+                                Text(
+                                  "$eveningLitres Litres",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
+                );
+              },
             ),
-          );
-        },
-      ),
-
-
     );
   }
 }
-
