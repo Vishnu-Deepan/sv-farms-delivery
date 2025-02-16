@@ -78,7 +78,6 @@ class ProfilePageLogic {
         'tel:+919080700123'; // Actual support number
     Uri supportPhoneNumberUrl = Uri.parse(supportPhoneNumber);
 
-
       if (await canLaunchUrl(supportPhoneNumberUrl)) {
         await launchUrl(supportPhoneNumberUrl);
       } else {
